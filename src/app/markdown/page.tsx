@@ -1,6 +1,7 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import ReactDOMServer from 'react-dom/server';
 
 type ComponentType = React.ComponentType<{
     children: React.ReactNode;
@@ -9,6 +10,8 @@ type ComponentType = React.ComponentType<{
 
 const MarkdownConverter: React.FC = () => {
     const [markdown, setMarkdown] = useState<string>('');
+    const [htmlCode, setHtmlCode] = useState<string>('');
+    const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
 
     const components: { [nodeType: string]: ComponentType } = {
         h1: ({ children, ...props }) => <h1 className="text-4xl font-bold mb-4" {...props}>{children}</h1>,
@@ -28,6 +31,13 @@ const MarkdownConverter: React.FC = () => {
                 ? <code className="bg-gray-100 rounded px-1" {...props}>{children}</code>
                 : <pre className="bg-gray-100 rounded p-4 mb-4"><code {...props}>{children}</code></pre>,
     };
+
+    useEffect(() => {
+        const htmlString = ReactDOMServer.renderToStaticMarkup(
+            <ReactMarkdown components={components}>{markdown}</ReactMarkdown>
+        );
+        setHtmlCode(htmlString);
+    }, [markdown]);
 
     const demoMarkdown = `# Sample Markdown
 This is a basic example of Markdown.
@@ -73,9 +83,36 @@ The end.`;
                     />
                 </div>
                 <div className="w-full md:w-1/2">
-                    <h2 className="text-xl font-semibold mb-2">HTML Preview</h2>
-                    <div className="border rounded p-4 h-[calc(100vh-200px)] overflow-auto bg-white">
-                        <ReactMarkdown components={components}>{markdown}</ReactMarkdown>
+                    <div className="flex mb-4">
+                        <button
+                            className={`py-2 px-4 font-semibold rounded-tl-lg rounded-tr-lg ${
+                                activeTab === 'preview'
+                                    ? 'bg-white border-t border-l border-r'
+                                    : 'bg-gray-200'
+                            }`}
+                            onClick={() => setActiveTab('preview')}
+                        >
+                            HTML Preview
+                        </button>
+                        <button
+                            className={`py-2 px-4 font-semibold rounded-tl-lg rounded-tr-lg ${
+                                activeTab === 'code'
+                                    ? 'bg-white border-t border-l border-r'
+                                    : 'bg-gray-200'
+                            }`}
+                            onClick={() => setActiveTab('code')}
+                        >
+                            HTML Code
+                        </button>
+                    </div>
+                    <div className="border rounded p-4 h-[calc(100vh-300px)] overflow-auto bg-white">
+                        {activeTab === 'preview' ? (
+                            <ReactMarkdown components={components}>{markdown}</ReactMarkdown>
+                        ) : (
+                            <pre className="bg-gray-100 p-4 rounded">
+                                <code>{htmlCode}</code>
+                            </pre>
+                        )}
                     </div>
                 </div>
             </div>
