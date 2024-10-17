@@ -29,14 +29,44 @@ const MarkdownConverter: React.FC = () => {
                 : <pre className="bg-gray-100 rounded p-4 mb-4"><code {...props}>{children}</code></pre>,
     };
 
+    const demoMarkdown = `# Sample Markdown
+This is a basic example of Markdown.
+## Second Heading
+ * Unordered list:
+   - Item 1
+   - Item 2
+   - Item 3
+ * More items
+> This is a blockquote.
+**Bold text**, *italic text*, and combined **bold and *italic*** text. ~~Strikethrough~~ text. [Link to example](https://example.com).
+### Code Example:
+\`\`\`js
+var foo = 'bar';
+function baz(s) {
+   return foo + ':' + s;
+}
+\`\`\`
+Inline code: \`var foo = 'bar';\`.
+The end.`;
+
+    const handleDemoClick = () => {
+        setMarkdown(demoMarkdown);
+    };
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6 text-center">Markdown to HTML Converter</h1>
             <div className="flex flex-col md:flex-row gap-4">
                 <div className="w-full md:w-1/2">
                     <h2 className="text-xl font-semibold mb-2">Markdown Input</h2>
+                    <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2"
+                        onClick={handleDemoClick}
+                    >
+                        Demo
+                    </button>
                     <textarea
-                        className="w-full h-[calc(100vh-200px)] p-2 border rounded resize-none"
+                        className="w-full h-[calc(100vh-250px)] p-2 border rounded resize-none"
                         value={markdown}
                         onChange={(e) => setMarkdown(e.target.value)}
                         placeholder="Enter your Markdown here..."
